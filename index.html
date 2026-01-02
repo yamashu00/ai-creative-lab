@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Creative Lab - 高校1年生 Webアプリ開発プロジェクト</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            overflow-y: scroll; /* Always show scrollbar to prevent layout shift */
+        }
+        .font-eng {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim {
+            animation: float 6s ease-in-out infinite;
+        }
+        .float-anim-delay {
+            animation: float 7s ease-in-out infinite 1s;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #34d399, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Grid Background */
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+
+        /* Tab Active State */
+        .tab-active {
+            background-color: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border-bottom: 2px solid #4ade80;
+        }
+        .tab-inactive {
+            color: #94a3b8;
+        }
+        .tab-inactive:hover {
+            color: #e2e8f0;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Fade In Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Step Connector */
+        .step-connector::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 2px;
+            height: 2rem;
+            background-color: #4b5563;
+            transform: translateX(-50%);
+        }
+        .step-connector:last-child::after {
+            display: none;
+        }
+        
+        /* Mobile connector fix */
+        @media (min-width: 768px) {
+            .step-connector::after {
+                top: 50%;
+                left: 100%;
+                width: 2rem;
+                height: 2px;
+                transform: translateY(-50%) translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-20 flex flex-col">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 z-0 bg-grid pointer-events-none"></div>
+    <div class="fixed top-0 left-0 w-96 h-96 bg-green-600 rounded-full filter blur-[150px] opacity-20 animate-pulse z-0"></div>
+    <div class="fixed bottom-0 right-0 w-96 h-96 bg-blue-600 rounded-full filter blur-[150px] opacity-20 animate-pulse z-0"></div>
+
+    <!-- Navigation (Tabs) -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-gray-700/50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center flex-shrink-0 cursor-pointer" onclick="switchTab('home')">
+                    <i data-lucide="cpu" class="h-8 w-8 text-green-400 mr-2"></i>
+                    <span class="font-eng font-bold text-xl tracking-wider hidden sm:block">AI Creative Lab</span>
+                </div>
+                
+                <!-- Tab Menu -->
+                <div class="flex space-x-1 overflow-x-auto no-scrollbar ml-4">
+                    <button onclick="switchTab('home')" id="tab-home" class="tab-active px-3 py-4 text-sm font-medium transition-all whitespace-nowrap flex items-center">
+                        <i data-lucide="home" class="w-4 h-4 mr-2"></i>Home
+                    </button>
+                    <button onclick="switchTab('vibe')" id="tab-vibe" class="tab-inactive px-3 py-4 text-sm font-medium transition-all whitespace-nowrap flex items-center">
+                        <i data-lucide="zap" class="w-4 h-4 mr-2"></i>Vibe Coding
+                    </button>
+                    <button onclick="switchTab('syllabus')" id="tab-syllabus" class="tab-inactive px-3 py-4 text-sm font-medium transition-all whitespace-nowrap flex items-center">
+                        <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>Schedule
+                    </button>
+                    <button onclick="switchTab('guide')" id="tab-guide" class="tab-inactive px-3 py-4 text-sm font-medium transition-all whitespace-nowrap flex items-center">
+                        <i data-lucide="book-open" class="w-4 h-4 mr-2"></i>Day 1: Hands-on
+                    </button>
+                    <button onclick="switchTab('prompts')" id="tab-prompts" class="tab-inactive px-3 py-4 text-sm font-medium transition-all whitespace-nowrap flex items-center">
+                        <i data-lucide="command" class="w-4 h-4 mr-2"></i>Prompts
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="relative z-10 pt-24 px-4 max-w-7xl mx-auto min-h-[80vh] flex-grow">
+
+        <!-- TAB 1: HOME -->
+        <div id="content-home" class="fade-in">
+            <div class="text-center pt-10 pb-16">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                    <span class="block mb-2 text-white">君のアイデアを、</span>
+                    <span class="text-gradient font-eng">Gemini × GAS</span>
+                    <span class="block mt-2 text-white">でカタチにする。</span>
+                </h1>
+                <p class="mt-6 max-w-3xl mx-auto text-xl text-gray-400 leading-relaxed font-light">
+                    情報Iで学んだ知識を、創造力に変える時が来た。<br>
+                    君の頭の中にある「作りたい」という熱意は、AIという翼を得て加速する。<br>
+                    教科書の枠を飛び出し、誰も見たことのないWebアプリを自分の手で生み出そう。
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <button onclick="switchTab('vibe')" class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-300 shadow-lg shadow-green-500/40">
+                        <span>まずは心得を知る</span>
+                        <i data-lucide="arrow-right" class="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                    <button onclick="switchTab('guide')" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-full hover:bg-gray-700 transition duration-300">
+                        <i data-lucide="code" class="mr-2 h-5 w-5"></i>
+                        Day 1: ハンズオン
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+                <div class="glass p-8 rounded-2xl border-l-4 border-green-500 float-anim">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 bg-green-900/50 rounded-lg mr-4">
+                            <i data-lucide="sparkles" class="h-8 w-8 text-green-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold">AI Native</h3>
+                    </div>
+                    <p class="text-gray-400">コードは「書く」ものではなく「生成する」ものへ。AIという最強のパートナーと一緒に、作りたいものを実現する新しい開発スタイルを体験しよう。</p>
+                </div>
+                <div class="glass p-8 rounded-2xl border-l-4 border-blue-500 float-anim-delay">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 bg-blue-900/50 rounded-lg mr-4">
+                            <i data-lucide="shield-check" class="h-8 w-8 text-blue-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold">Secure Deploy</h3>
+                    </div>
+                    <p class="text-gray-400">Google Workspace for Educationを活用。学校のアカウントで安全に認証し、クラス内だけで共有できる環境でWebアプリを公開しよう。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: VIBE CODING -->
+        <div id="content-vibe" class="hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-4">What is "Vibe Coding"?</h2>
+                <p class="text-gray-400">文法暗記はもう終わり。AIと共に「創る」ことに集中する、新しい開発スタイル。</p>
+            </div>
+
+            <!-- 1. The Collaborative Mindset -->
+            <div class="mb-20">
+                <h3 class="text-2xl font-bold text-gradient mb-8 flex items-center">
+                    <i data-lucide="users" class="mr-3"></i>1. 共同的なアプローチ (Co-creation)
+                </h3>
+                <div class="glass p-8 rounded-2xl">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="w-full md:w-1/2">
+                            <h4 class="text-xl font-bold text-white mb-4">AIは「魔法の杖」ではなく「相棒」</h4>
+                            <p class="text-gray-300 leading-relaxed mb-4">
+                                一発で完璧なアプリが出てくることは稀です。大切なのは、AIと<span class="text-green-400 font-bold">対話（キャッチボール）</span>をすること。<br>
+                                人間がアイデアを出し、AIが実装し、人間が確認して、またAIに修正を頼む。このサイクルの繰り返しこそが開発です。
+                            </p>
+                            <div class="bg-gray-900/50 p-4 rounded-lg border-l-4 border-green-500">
+                                <p class="text-sm text-gray-400">
+                                    <span class="font-bold text-green-400">POINT:</span><br>
+                                    「作って終わり」ではありません。AIが出してきたものに対して「もっとこうして」「ここは違う」とフィードバックを返すことで、どんどん良くなっていきます。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col gap-4">
+                            <!-- Dialogue Example -->
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="user" class="text-white w-5 h-5"></i>
+                                </div>
+                                <div class="bg-blue-900/30 p-3 rounded-xl rounded-tl-none border border-blue-500/30 text-sm w-full">
+                                    「英単語アプリを作って」
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 flex-row-reverse">
+                                <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="bot" class="text-white w-5 h-5"></i>
+                                </div>
+                                <div class="bg-green-900/30 p-3 rounded-xl rounded-tr-none border border-green-500/30 text-sm w-full">
+                                    （コードを生成...）「作りました！」
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="user" class="text-white w-5 h-5"></i>
+                                </div>
+                                <div class="bg-blue-900/30 p-3 rounded-xl rounded-tl-none border border-blue-500/30 text-sm w-full">
+                                    「ありがとう！でも文字が小さくて見にくいから、もっと大きくして。あと背景は黒がいいな」
+                                </div>
+                            </div>
+                            <div class="text-center text-xs text-gray-500 mt-2">↑ このやり取りがVibe Coding！</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Abstraction Control -->
+            <div class="mb-20">
+                <h3 class="text-2xl font-bold text-gradient mb-8 flex items-center">
+                    <i data-lucide="sliders" class="mr-3"></i>2. 抽象度のコントロール (Abstraction)
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Concept -->
+                    <div>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            AIへの指示には<span class="text-yellow-400 font-bold">「抽象度（具体性のレベル）」</span>があります。これを使い分けるのが上級者への近道です。
+                            エレベーターのように、状況に合わせて階層を行き来しましょう。
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="glass p-5 rounded-xl border-l-4 border-purple-500">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-bold text-purple-400">高層階（抽象度：高）</h4>
+                                    <span class="text-xs bg-purple-900 px-2 py-1 rounded">企画・デザイン段階</span>
+                                </div>
+                                <p class="text-sm text-gray-300 mb-2">ふわっとした指示。全体の雰囲気やコンセプトを伝える時。</p>
+                                <div class="bg-black/30 p-2 rounded text-xs text-gray-400 font-mono">
+                                    "近未来的でサイバーパンクな雰囲気にして"<br>
+                                    "高校生が毎日使いたくなるような楽しい感じで"
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center text-gray-500">
+                                <i data-lucide="arrow-up-down" class="w-6 h-6 animate-bounce"></i>
+                            </div>
+
+                            <div class="glass p-5 rounded-xl border-l-4 border-orange-500">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-bold text-orange-400">低層階（抽象度：低）</h4>
+                                    <span class="text-xs bg-orange-900 px-2 py-1 rounded">修正・デバッグ段階</span>
+                                </div>
+                                <p class="text-sm text-gray-300 mb-2">カチッとした指示。具体的な動作や数値、エラー修正をする時。</p>
+                                <div class="bg-black/30 p-2 rounded text-xs text-gray-400 font-mono">
+                                    "背景色は #0f172a に変更して"<br>
+                                    "ボタンを押した時に alert('OK') を出して"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Visualization -->
+                    <div class="glass p-8 rounded-2xl flex flex-col justify-center items-center text-center">
+                        <h4 class="text-xl font-bold text-white mb-6">いつ、どのレベルで話す？</h4>
+                        <div class="w-full space-y-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-1/3 text-right text-sm text-gray-400">最初 (Start)</div>
+                                <div class="w-2/3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-purple-500 w-3/4"></div>
+                                </div>
+                                <div class="w-1/6 text-left text-xs text-purple-400">抽象的</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-1/3 text-right text-sm text-gray-400">中盤 (Dev)</div>
+                                <div class="w-2/3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-purple-500 to-orange-500 w-full"></div>
+                                </div>
+                                <div class="w-1/6 text-left text-xs text-gray-400">Mix</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-1/3 text-right text-sm text-gray-400">仕上げ (Fix)</div>
+                                <div class="w-2/3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-orange-500 w-1/4 ml-auto"></div>
+                                </div>
+                                <div class="w-1/6 text-left text-xs text-orange-400">具体的</div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-8">
+                            最初は「ふわっと」作り始めて、徐々に「細かく」指示していくのがコツです。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Incremental Development -->
+            <div class="mb-12">
+                <h3 class="text-2xl font-bold text-gradient mb-8 flex items-center">
+                    <i data-lucide="layers" class="mr-3"></i>3. 段階的な開発 (Step-by-Step)
+                </h3>
+                <p class="text-gray-300 mb-8 max-w-3xl">
+                    いきなり完成品を作ろうとすると失敗します。Webアプリ開発は「積み木」のようなものです。<br>
+                    まずは土台を作り、少しずつ機能を足していく<span class="text-blue-400 font-bold">「スモールスタート」</span>を心がけましょう。
+                </p>
+
+                <div class="flex flex-col md:flex-row gap-4 justify-between relative">
+                    <!-- Step 1 -->
+                    <div class="glass p-6 rounded-xl flex-1 step-connector relative z-10 hover:border-blue-500 transition">
+                        <div class="absolute -top-3 left-4 bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded border border-gray-600">Level 1</div>
+                        <h4 class="text-lg font-bold text-blue-400 mb-2">動くゴミ (MVP)</h4>
+                        <p class="text-sm text-gray-400">
+                            デザインは適当でいい。とにかくボタンを押したら反応するだけの、最小限のものを作る。
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="glass p-6 rounded-xl flex-1 step-connector relative z-10 hover:border-blue-500 transition">
+                        <div class="absolute -top-3 left-4 bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded border border-gray-600">Level 2</div>
+                        <h4 class="text-lg font-bold text-blue-400 mb-2">見た目を整える</h4>
+                        <p class="text-sm text-gray-400">
+                            Tailwind CSSなどを適用して、それっぽくする。「抽象度：高」の指示で雰囲気を変える。
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="glass p-6 rounded-xl flex-1 relative z-10 hover:border-blue-500 transition">
+                        <div class="absolute -top-3 left-4 bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded border border-gray-600">Level 3</div>
+                        <h4 class="text-lg font-bold text-blue-400 mb-2">機能追加・保存</h4>
+                        <p class="text-sm text-gray-400">
+                            localStorageでデータを保存したり、音を出したり、複雑な機能を追加して完成度を高める。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-16 pb-10">
+                <p class="text-white mb-6 font-bold text-lg">さあ、このマインドセットで始めよう！</p>
+                <button onclick="switchTab('guide')" class="bg-white text-black font-bold px-8 py-4 rounded-full hover:bg-gray-200 transition shadow-lg flex items-center mx-auto">
+                    <span>Day 1 ハンズオンへ進む</span>
+                    <i data-lucide="arrow-right" class="ml-2 w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB 3: SCHEDULE (SYLLABUS) -->
+        <div id="content-syllabus" class="hidden">
+             <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">Project Roadmap</h2>
+                <p class="text-gray-400">3学期を通して、アイデアを形にしていくスケジュールです。</p>
+            </div>
+
+            <div class="relative border-l-2 border-gray-700 ml-4 md:ml-10 space-y-12 pb-12">
+                <!-- Phase 0: Hands-on (New) -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-yellow-500 group-hover:scale-125 transition"></div>
+                    <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-yellow-500 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-white">Phase 0: ハンズオン体験</h3>
+                            <span class="text-xs bg-yellow-900 text-yellow-300 px-2 py-1 rounded">Day 1</span>
+                        </div>
+                        <p class="text-gray-400 mb-4">まずは理屈より実践。簡単なアプリをAIと一緒に作り、完成までの一連の流れ（生成→実行→公開）を体験します。</p>
+                        <div class="flex gap-3">
+                             <button onclick="switchTab('guide')" class="text-sm bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg flex items-center transition">
+                                <i data-lucide="zap" class="w-4 h-4 mr-2"></i>
+                                ハンズオンガイドへ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 1 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-green-600 group-hover:scale-125 transition"></div>
+                    <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-green-500 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-white">Phase 1: 企画 & AIブレスト</h3>
+                            <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">1-2週目</span>
+                        </div>
+                        <p class="text-gray-400 mb-4">作りたいもののイメージを固めます。Geminiと会話しながら、「どんな機能が必要か」「どんなデザインにするか」を整理し、設計図（要件定義）を作ります。</p>
+                        <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
+                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-green-400"></i>Goal: 「こんなアプリを作る！」という企画書が完成していること。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-green-600 group-hover:scale-125 transition"></div>
+                    <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-green-500 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-white">Phase 2: プロトタイピング</h3>
+                            <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">3-4週目</span>
+                        </div>
+                        <p class="text-gray-400 mb-4">実際にAIにコードを書かせます。まずは自分のPC（ローカル環境）で動くものを作ります。エラーが出たらAIに画面を見せて修正させましょう。</p>
+                         <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
+                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-green-400"></i>Goal: 自分のPC上で、とりあえず動くアプリができていること。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-blue-600 group-hover:scale-125 transition"></div>
+                    <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-blue-500 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-white">Phase 3: GASへの移植</h3>
+                            <span class="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded">5週目</span>
+                        </div>
+                        <p class="text-gray-400 mb-4">PCで作ったコードを、Google Apps Script (GAS) にコピーします。Webアプリとして公開するための設定を行います。</p>
+                         <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
+                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-blue-400"></i>Goal: デプロイURLが発行され、自分のスマホで見られること。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-blue-600 group-hover:scale-125 transition"></div>
+                    <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-blue-500 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-white">Phase 4: 発表 & 相互評価</h3>
+                            <span class="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded">6週目〜</span>
+                        </div>
+                        <p class="text-gray-400 mb-4">クラスメイトにURLを共有して遊んでもらいます。フィードバックをもらってさらに改善したり、工夫した点をプレゼンしたりします。</p>
+                         <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
+                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-blue-400"></i>Goal: お互いの作品をリスペクトし、評価し合うこと。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: GUIDE (Hands-on) -->
+        <div id="content-guide" class="hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-4">Day 1: Hands-on</h2>
+                <p class="text-gray-400 mb-6">今日は練習です。この手順通りに進めて、まずは1つアプリを作ってみましょう。</p>
+                
+                <a href="https://script.google.com/macros/library/d/1ASooT4a10PrVT9SfPJmck9FIlyzn5hp_rSHtBFsHno6XWaxslNiU4zal/2" target="_blank" class="inline-flex items-center px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-full transition text-blue-300 text-sm">
+                    <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+                    ハンズオンサンプルアプリ_カウンターアプリ
+                </a>
+            </div>
+
+            <div class="max-w-3xl mx-auto mb-12 glass p-5 rounded-xl border-l-4 border-blue-500 flex items-start gap-4">
+                <div class="p-3 bg-blue-900/50 rounded-full">
+                    <i data-lucide="keyboard" class="w-6 h-6 text-blue-400"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-2">⚡️ MacBook 爆速ショートカット</h4>
+                    <p class="text-sm text-gray-300 mb-2">
+                        プログラマーはマウスを使いません。キーボードショートカットを使って、ミスなく素早く操作しましょう。
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+                        <div class="bg-gray-800 p-2 rounded text-center border border-gray-600">
+                            <span class="text-yellow-400">Command + C</span><br>コピー
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded text-center border border-gray-600">
+                            <span class="text-yellow-400">Command + V</span><br>貼り付け
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded text-center border border-gray-600">
+                            <span class="text-yellow-400">Command + A</span><br>全選択
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-12">
+                
+                <!-- Guide Step 0 -->
+                 <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/3">
+                        <div class="sticky top-24">
+                            <div class="glass p-6 rounded-2xl border-t-4 border-gray-500">
+                                <span class="text-5xl font-bold text-gray-500/20 absolute top-4 right-4">00</span>
+                                <h3 class="text-xl font-bold text-gray-300 mb-2">準備 (Ready)</h3>
+                                <p class="text-gray-400 mb-4">開発を始める準備をします。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 glass p-8 rounded-2xl">
+                        <h4 class="font-bold text-lg mb-4 flex items-center">
+                            <i data-lucide="log-in" class="mr-2 text-gray-400"></i>
+                            Geminiにアクセス
+                        </h4>
+                        <ol class="list-decimal list-inside space-y-4 text-gray-300">
+                            <li class="pl-2">
+                                <span class="font-bold text-white">Googleアカウントにログイン</span><br>
+                                <span class="text-sm text-gray-400 ml-5">学校のアカウントを使用してください。</span>
+                            </li>
+                            <li class="pl-2">
+                                <span class="font-bold text-white">Geminiを開く</span><br>
+                                <span class="text-sm text-gray-400 ml-5">
+                                    <a href="https://gemini.google.com/" target="_blank" class="text-blue-400 underline hover:text-blue-300">https://gemini.google.com/</a> にアクセスします。
+                                </span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Guide Step 1 -->
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/3">
+                        <div class="sticky top-24">
+                            <div class="glass p-6 rounded-2xl border-t-4 border-purple-500">
+                                <span class="text-5xl font-bold text-purple-500/20 absolute top-4 right-4">01</span>
+                                <h3 class="text-xl font-bold text-purple-400 mb-2">設定 (Setup)</h3>
+                                <p class="text-gray-400 mb-4">正しいモードを選択します。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 glass p-8 rounded-2xl">
+                        <h4 class="font-bold text-lg mb-4 flex items-center">
+                            <i data-lucide="settings-2" class="mr-2 text-purple-400"></i>
+                            モデル・Canvasモード選択
+                        </h4>
+                        <div class="space-y-4 text-gray-300">
+                            <p>Geminiの画面左上にあるモデル選択メニューを確認してください。</p>
+                            <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li><span class="text-white font-bold">Gemini 2.0 Flash</span> (または最新のモデル) が選ばれているか確認。</li>
+                                    <li>もし「Canvas」という表示があれば、それを選ぶとコーディングに適した画面になります。</li>
+                                    <li class="text-xs text-gray-500">※画面レイアウトは更新されることがあります。「コードを書きたい」と思っていればOKです。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guide Step 2 -->
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/3">
+                        <div class="sticky top-24">
+                            <div class="glass p-6 rounded-2xl border-t-4 border-green-500">
+                                <span class="text-5xl font-bold text-green-500/20 absolute top-4 right-4">02</span>
+                                <h3 class="text-xl font-bold text-green-400 mb-2">生成 (Generate)</h3>
+                                <p class="text-gray-400 mb-4">Geminiにコードを書いてもらいます。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 glass p-8 rounded-2xl">
+                        <h4 class="font-bold text-lg mb-4 flex items-center">
+                            <i data-lucide="message-square" class="mr-2 text-green-400"></i>
+                            基本のプロンプト
+                        </h4>
+                        <p class="text-gray-300 mb-4">
+                            以下のプロンプトをコピーして、Geminiに入力（<span class="font-mono text-yellow-400">Cmd + V</span>）してください。
+                        </p>
+                        <div class="bg-gray-900 rounded-lg p-4 relative group border border-gray-700">
+                             <div class="absolute top-2 right-2">
+                                <button onclick="copyToClipboard(this, 'guide-prompt-1')" class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded flex items-center transition">
+                                    <i data-lucide="copy" class="w-3 h-3 mr-1"></i>Copy
+                                </button>
+                            </div>
+                            <code id="guide-prompt-1" class="text-sm text-green-400 font-mono block break-all whitespace-pre-wrap">あなたは優秀なWebエンジニアです。高校生向けの学習用Webアプリを作りたいです。
+
+【テーマ】
+シンプルな「ストップウォッチ」
+
+【要件】
+1. デザインはTailwind CSSを使用し、黒背景にネオンカラー（緑やピンク）を使ったサイバーなデザインにしてください。
+2. スタート、ストップ、リセットボタンをつけてください。
+3. 時間は「00:00:00」形式で大きく表示してください。
+
+コードのみを出力してください。</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guide Step 3 (Built on GAS) -->
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/3">
+                        <div class="sticky top-24">
+                            <div class="glass p-6 rounded-2xl border-t-4 border-blue-500">
+                                <span class="text-5xl font-bold text-blue-500/20 absolute top-4 right-4">03</span>
+                                <h3 class="text-xl font-bold text-blue-400 mb-2">構築 (Build)</h3>
+                                <p class="text-gray-400">Google Apps Scriptでアプリを作成します。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 glass p-8 rounded-2xl">
+                        <h4 class="font-bold text-lg mb-4 flex items-center">
+                            <i data-lucide="code-2" class="mr-2 text-blue-400"></i>
+                            GASプロジェクトの作成
+                        </h4>
+                        <div class="space-y-6 text-gray-300">
+                            <div>
+                                <p class="mb-2 font-bold text-white">1. プロジェクト作成</p>
+                                <p class="text-sm">
+                                    <a href="https://script.google.com/home" target="_blank" class="underline text-blue-400">Apps Scriptのホーム</a> へ行き、「新しいプロジェクト」をクリック。
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <p class="mb-2 font-bold text-white">2. コード.gs の編集</p>
+                                <p class="text-sm mb-2">元々入っているコードをクリックし、全選択（<span class="font-mono text-yellow-400">Cmd + A</span>）してDeleteキーで削除。その後、以下を貼り付け（<span class="font-mono text-yellow-400">Cmd + V</span>）ます。※これがないと動きません。</p>
+                                <div class="bg-gray-900 rounded p-3 relative border border-gray-700">
+                                    <button onclick="copyToClipboard(this, 'gas-code')" class="absolute top-2 right-2 text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded">Copy</button>
+                                    <code id="gas-code" class="text-xs text-blue-300 font-mono">function doGet() {
+  return HtmlService.createHtmlOutputFromFile('index')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}</code>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="mb-2 font-bold text-white">3. HTMLファイルの作成</p>
+                                <p class="text-sm">画面左上の「ファイル +」ボタン > 「HTML」を選択 > 名前を「<span class="font-bold text-white">index</span>」にする。<br>
+                                Geminiが生成したコードをコピーし、ここに貼り付け（<span class="font-mono text-yellow-400">Cmd + V</span>）ます。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guide Step 4 (Deploy) -->
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/3">
+                        <div class="sticky top-24">
+                            <div class="glass p-6 rounded-2xl border-t-4 border-pink-500">
+                                <span class="text-5xl font-bold text-pink-500/20 absolute top-4 right-4">04</span>
+                                <h3 class="text-xl font-bold text-pink-400 mb-2">公開 (Deploy)</h3>
+                                <p class="text-gray-400">アプリをインターネットに公開します。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 glass p-8 rounded-2xl">
+                        <h4 class="font-bold text-lg mb-4 flex items-center">
+                            <i data-lucide="rocket" class="mr-2 text-pink-400"></i>
+                            デプロイの手順（重要）
+                        </h4>
+                        <div class="space-y-4 text-gray-300">
+                            <p class="text-sm bg-pink-900/20 p-3 rounded border border-pink-500/30 mb-4">
+                                一つでも設定を間違えると動かないので、慎重に進めてください。
+                            </p>
+                            
+                            <ol class="list-decimal list-inside space-y-4 text-sm">
+                                <li>
+                                    <span class="font-bold text-white">画面右上の「デプロイ」ボタンをクリック</span><br>
+                                    出てきたメニューから<span class="text-blue-300">「新しいデプロイ」</span>を選択します。
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">種類の選択</span><br>
+                                    左側の歯車アイコン⚙️をクリックし、<span class="text-blue-300">「ウェブアプリ」</span>を選びます。
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">設定項目の入力</span><br>
+                                    <div class="ml-5 mt-2 space-y-2 p-3 bg-gray-900 rounded border border-gray-700">
+                                        <div>・説明: <span class="text-gray-400">（空欄でもOK）</span></div>
+                                        <div>・次のユーザーとして実行: <span class="text-yellow-400 font-bold">自分</span></div>
+                                        <div>・アクセスできるユーザー: <span class="text-green-400 font-bold text-base">聖学院中学校・高等学校 内の全員</span></div>
+                                    </div>
+                                    <p class="text-xs text-red-400 mt-2">※「自分のみ」にすると他の人が見られません。</p>
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">デプロイ実行</span><br>
+                                    右下の「デプロイ」ボタンを押します。
+                                    <br><span class="text-xs text-gray-400">※初回は「アクセスを承認」などの画面が出ることがあります。その場合は指示に従って許可してください。</span>
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">完了</span><br>
+                                    「ウェブアプリ」の下に表示されたURLが、あなたのアプリのURLです！クリックして開いてみましょう。
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guide Step 5: Submission -->
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/3">
+                        <div class="sticky top-24">
+                            <div class="glass p-6 rounded-2xl border-t-4 border-yellow-500 animate-pulse border-opacity-50">
+                                <span class="text-5xl font-bold text-yellow-500/20 absolute top-4 right-4">05</span>
+                                <h3 class="text-xl font-bold text-yellow-400 mb-2">提出 (Submit)</h3>
+                                <p class="text-gray-400 mb-4">今日の成果を提出します。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 glass p-8 rounded-2xl border border-yellow-500/30">
+                        <h4 class="font-bold text-lg mb-4 flex items-center text-yellow-400">
+                            <i data-lucide="send" class="mr-2"></i>
+                            本日の成果物提出
+                        </h4>
+                        
+                        <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+                            <h5 class="font-bold text-white mb-2 text-sm">あとからURLを確認する方法:</h5>
+                            <ol class="list-decimal list-inside space-y-2 text-gray-300 text-sm">
+                                <li>GASの画面右上にある「デプロイ」をクリック。</li>
+                                <li>「デプロイを管理」をクリック。</li>
+                                <li>作成したデプロイを選択し、「ウェブアプリ」のURLの下にある<span class="text-white bg-gray-700 px-1 rounded">コピー</span>をクリック。</li>
+                            </ol>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-gray-300 mb-4 text-sm">URLをコピーしたら、以下のフォームから提出してください。</p>
+                            <a href="https://forms.gle/xyS6DpJaJ9THkydD6" target="_blank" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-black bg-yellow-400 rounded-full hover:bg-yellow-300 transition duration-300 shadow-lg shadow-yellow-500/20">
+                                <i data-lucide="external-link" class="mr-2 h-5 w-5"></i>
+                                提出フォームを開く
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 5: PROMPTS -->
+        <div id="content-prompts" class="hidden">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-4">Prompt Library</h2>
+                <p class="text-gray-400">困ったときの「魔法の呪文」集。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- P1 -->
+                <div class="glass p-6 rounded-xl border border-gray-600 hover:border-green-500 transition group">
+                    <h3 class="font-bold text-green-400 mb-2 flex items-center">
+                        <i data-lucide="palette" class="w-4 h-4 mr-2"></i>もっとカッコよくしたい
+                    </h3>
+                    <div class="bg-gray-900 p-4 rounded-lg relative h-32 overflow-y-auto custom-scrollbar">
+                        <button onclick="copyToClipboard(this, 'p-design')" class="absolute top-2 right-2 text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Copy</button>
+                        <p id="p-design" class="text-sm text-gray-300 font-mono">今のデザインは少し地味です。高校生が好むような、サイバーパンク風のデザインに変更してください。ボタンはネオンのように光らせて、ホバーすると色が変化するアニメーションをつけてください。</p>
+                    </div>
+                </div>
+
+                <!-- P2 -->
+                <div class="glass p-6 rounded-xl border border-gray-600 hover:border-green-500 transition group">
+                    <h3 class="font-bold text-green-400 mb-2 flex items-center">
+                        <i data-lucide="database" class="w-4 h-4 mr-2"></i>データを保存したい
+                    </h3>
+                    <div class="bg-gray-900 p-4 rounded-lg relative h-32 overflow-y-auto custom-scrollbar">
+                        <button onclick="copyToClipboard(this, 'p-storage')" class="absolute top-2 right-2 text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Copy</button>
+                        <p id="p-storage" class="text-sm text-gray-300 font-mono">今のままだとリロードするとデータが消えてしまいます。JavaScriptのlocalStorageを使って、入力した内容やスコアをブラウザに保存し、次回開いたときも残っているように修正してください。</p>
+                    </div>
+                </div>
+
+                <!-- P3 -->
+                <div class="glass p-6 rounded-xl border border-gray-600 hover:border-red-500 transition group">
+                    <h3 class="font-bold text-red-400 mb-2 flex items-center">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i>エラーで動かない
+                    </h3>
+                    <div class="bg-gray-900 p-4 rounded-lg relative h-32 overflow-y-auto custom-scrollbar">
+                        <button onclick="copyToClipboard(this, 'p-fix')" class="absolute top-2 right-2 text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Copy</button>
+                        <p id="p-fix" class="text-sm text-gray-300 font-mono">コードを実行したら動きません。コンソールに以下のエラーが出ています。<br>
+[ここにエラーメッセージを貼り付け]<br>
+この原因を特定し、修正したコード全体を再度出力してください。</p>
+                    </div>
+                </div>
+
+                <!-- P4 -->
+                <div class="glass p-6 rounded-xl border border-gray-600 hover:border-blue-500 transition group">
+                    <h3 class="font-bold text-blue-400 mb-2 flex items-center">
+                        <i data-lucide="image" class="w-4 h-4 mr-2"></i>画像が出ない (GAS用)
+                    </h3>
+                    <div class="bg-gray-900 p-4 rounded-lg relative h-32 overflow-y-auto custom-scrollbar">
+                        <button onclick="copyToClipboard(this, 'p-gas-img')" class="absolute top-2 right-2 text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Copy</button>
+                        <p id="p-gas-img" class="text-sm text-gray-300 font-mono">Google Apps Scriptで動かしたら画像が表示されません（リンク切れマークになります）。<br>
+相対パスを使わず、画像データをBase64エンコードしてimgタグのsrcに直接埋め込む形式に書き換えてください。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 border-t border-gray-800 text-center relative z-10 mt-auto">
+        <p class="text-gray-500 text-sm">© 2026 Information I Class Project. Created by 情報科 山本周.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all contents
+            const contents = ['home', 'vibe', 'syllabus', 'guide', 'prompts'];
+            contents.forEach(id => {
+                const el = document.getElementById(`content-${id}`);
+                el.classList.add('hidden');
+                el.classList.remove('fade-in');
+            });
+
+            // Show selected content
+            const selectedContent = document.getElementById(`content-${tabId}`);
+            selectedContent.classList.remove('hidden');
+            selectedContent.classList.add('fade-in');
+
+            // Reset tab styles
+            const tabs = ['home', 'vibe', 'syllabus', 'guide', 'prompts'];
+            tabs.forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                btn.classList.remove('tab-active');
+                btn.classList.add('tab-inactive');
+            });
+
+            // Set active tab style
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('tab-inactive');
+            activeBtn.classList.add('tab-active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Copy Function
+        function copyToClipboard(button, elementId) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i data-lucide="check" class="w-3 h-3 mr-1"></i>Copied!';
+                button.classList.remove('bg-green-600', 'bg-gray-700', 'bg-blue-600');
+                button.classList.add('bg-white', 'text-black');
+                
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('bg-white', 'text-black');
+                    
+                    if(button.parentElement.classList.contains('absolute')) {
+                        button.classList.add('bg-gray-700', 'text-white');
+                    } else {
+                        button.classList.add('bg-green-600', 'text-white');
+                    }
+                    lucide.createIcons();
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('コピーできませんでした。');
+            });
+        }
+    </script>
+</body>
+</html>
