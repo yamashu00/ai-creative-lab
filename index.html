@@ -396,7 +396,7 @@
             </div>
 
             <div class="relative border-l-2 border-gray-700 ml-4 md:ml-10 space-y-12 pb-12">
-                <!-- Phase 0: Hands-on (New) -->
+                <!-- Phase 0: Hands-on -->
                 <div class="relative pl-8 md:pl-12 group">
                     <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-yellow-500 group-hover:scale-125 transition"></div>
                     <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-yellow-500 transition">
@@ -414,7 +414,7 @@
                     </div>
                 </div>
 
-                <!-- Step 1 -->
+                <!-- Phase 1: Planning -->
                 <div class="relative pl-8 md:pl-12 group">
                     <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-green-600 group-hover:scale-125 transition"></div>
                     <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-green-500 transition">
@@ -422,54 +422,66 @@
                             <h3 class="text-xl font-bold text-white">Phase 1: 企画 & AIブレスト</h3>
                             <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">1-2週目</span>
                         </div>
-                        <p class="text-gray-400 mb-4">作りたいもののイメージを固めます。Geminiと会話しながら、「どんな機能が必要か」「どんなデザインにするか」を整理し、設計図（要件定義）を作ります。</p>
-                        <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
-                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-green-400"></i>Goal: 「こんなアプリを作る！」という企画書が完成していること。
+                        <p class="text-gray-400 mb-4">専用のAIアシスタントと会話しながら、「どんな機能が必要か」「どんなデザインにするか」を整理し、企画を固めます。</p>
+                        <div class="flex flex-col gap-3">
+                            <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300 mb-2">
+                                <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-green-400"></i>Goal: 「こんなアプリを作る！」という企画書が完成していること。
+                            </div>
+                            <a href="https://gemini.google.com/gem/1ZHhae9z3NCb0RX5_0NyqDifzWtYFV_Md?usp=sharing" target="_blank" class="text-sm bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center transition w-fit">
+                                <i data-lucide="lightbulb" class="w-4 h-4 mr-2"></i>
+                                アイデア発想Gemを開く
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 2 -->
+                <!-- Phase 2: Coding (Canvas) -->
                 <div class="relative pl-8 md:pl-12 group">
                     <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-green-600 group-hover:scale-125 transition"></div>
                     <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-green-500 transition">
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-white">Phase 2: プロトタイピング</h3>
+                            <h3 class="text-xl font-bold text-white">Phase 2: 実装 & プレビュー</h3>
                             <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">3-4週目</span>
                         </div>
-                        <p class="text-gray-400 mb-4">実際にAIにコードを書かせます。まずは自分のPC（ローカル環境）で動くものを作ります。エラーが出たらAIに画面を見せて修正させましょう。</p>
-                         <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
-                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-green-400"></i>Goal: 自分のPC上で、とりあえず動くアプリができていること。
+                        <p class="text-gray-400 mb-4">Canvas機能に特化したAIを使ってコードを生成します。AIに指示を出し、リアルタイムでコードが出来上がっていく様子を体験しましょう。</p>
+                        <div class="flex flex-col gap-3">
+                            <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300 mb-2">
+                                <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-green-400"></i>Goal: AIを使ってアプリの基本コードを生成すること。
+                            </div>
+                            <a href="https://gemini.google.com/gem/1Zg6phhfGFJ6HVbhwUEfkC8CK2azm32xa?usp=sharing" target="_blank" class="text-sm bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center transition w-fit">
+                                <i data-lucide="code-2" class="w-4 h-4 mr-2"></i>
+                                Canvas機能Gemを開く
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 3 -->
+                <!-- Phase 3: Prototyping (Preview) -->
                 <div class="relative pl-8 md:pl-12 group">
                     <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-blue-600 group-hover:scale-125 transition"></div>
                     <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-blue-500 transition">
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-white">Phase 3: GASへの移植</h3>
+                            <h3 class="text-xl font-bold text-white">Phase 3: プロトタイピング</h3>
                             <span class="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded">5週目</span>
                         </div>
-                        <p class="text-gray-400 mb-4">PCで作ったコードを、Google Apps Script (GAS) にコピーします。Webアプリとして公開するための設定を行います。</p>
+                        <p class="text-gray-400 mb-4">Gemini Canvasのプレビュー機能を使って、その場で動作確認を行います。PCにファイルを保存する必要はありません。動かない場合はすぐにAIに修正を依頼しましょう。</p>
                          <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
-                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-blue-400"></i>Goal: デプロイURLが発行され、自分のスマホで見られること。
+                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-blue-400"></i>Goal: Canvas上のプレビュー画面で、アプリが正しく動く状態にすること。
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 4 -->
+                <!-- Phase 4: Deploy & Presentation -->
                 <div class="relative pl-8 md:pl-12 group">
                     <div class="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-blue-600 group-hover:scale-125 transition"></div>
                     <div class="glass p-6 rounded-xl border border-gray-700 group-hover:border-blue-500 transition">
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-white">Phase 4: 発表 & 相互評価</h3>
+                            <h3 class="text-xl font-bold text-white">Phase 4: 公開 & 相互評価</h3>
                             <span class="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded">6週目〜</span>
                         </div>
-                        <p class="text-gray-400 mb-4">クラスメイトにURLを共有して遊んでもらいます。フィードバックをもらってさらに改善したり、工夫した点をプレゼンしたりします。</p>
+                        <p class="text-gray-400 mb-4">完成したコードをGASに移してWeb公開します。クラスメイトにURLを共有して遊んでもらい、フィードバックをもらってさらに改善しましょう。</p>
                          <div class="bg-gray-900/50 p-3 rounded text-sm text-gray-300">
-                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-blue-400"></i>Goal: お互いの作品をリスペクトし、評価し合うこと。
+                            <i data-lucide="check-square" class="inline w-4 h-4 mr-2 text-blue-400"></i>Goal: デプロイURLを発行し、お互いの作品をリスペクトし合うこと。
                         </div>
                     </div>
                 </div>
